@@ -1,4 +1,4 @@
-import { FileText, Clock, Loader2, CheckCircle, RotateCcw } from "lucide-react";
+import { FileText, Clock, Loader2, CheckCircle } from "lucide-react";
 
 interface EvaluatorSummaryProps {
   stats: {
@@ -6,7 +6,6 @@ interface EvaluatorSummaryProps {
     siapDievaluasi: number;
     dalamEvaluasi: number;
     selesai: number;
-    perluReviewUlang: number;
   };
 }
 
@@ -56,15 +55,6 @@ const EvaluatorSummary = ({ stats }: EvaluatorSummaryProps) => {
           <p className="text-2xl font-bold text-foreground">{stats.selesai}</p>
         </div>
       </div>
-
-      {stats.perluReviewUlang > 0 && (
-        <div className="mt-4 p-3 bg-warning/10 border border-warning/20 rounded-lg flex items-center gap-2">
-          <RotateCcw className="w-4 h-4 text-warning" />
-          <span className="text-sm text-warning">
-            {stats.perluReviewUlang} laporan memerlukan review ulang
-          </span>
-        </div>
-      )}
     </div>
   );
 };
