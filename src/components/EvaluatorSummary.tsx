@@ -1,4 +1,4 @@
-import { FileText, Clock, Loader2, CheckCircle, AlertTriangle, RotateCcw } from "lucide-react";
+import { FileText, Clock, Loader2, CheckCircle, RotateCcw } from "lucide-react";
 
 interface EvaluatorSummaryProps {
   stats: {
@@ -7,7 +7,6 @@ interface EvaluatorSummaryProps {
     dalamEvaluasi: number;
     selesai: number;
     perluReviewUlang: number;
-    painPoints: number;
   };
 }
 
@@ -24,7 +23,7 @@ const EvaluatorSummary = ({ stats }: EvaluatorSummaryProps) => {
         </div>
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-muted/50 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <FileText className="w-4 h-4 text-muted-foreground" />
@@ -55,14 +54,6 @@ const EvaluatorSummary = ({ stats }: EvaluatorSummaryProps) => {
             <span className="text-xs text-success font-medium">Selesai</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.selesai}</p>
-        </div>
-        
-        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-4 h-4 text-destructive" />
-            <span className="text-xs text-destructive font-medium">Pain Points</span>
-          </div>
-          <p className="text-2xl font-bold text-destructive">{stats.painPoints}</p>
         </div>
       </div>
 

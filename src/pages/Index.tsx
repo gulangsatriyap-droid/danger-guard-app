@@ -43,7 +43,6 @@ const Index = () => {
     dalamEvaluasi: evaluatorReports.filter(r => r.evaluationStatus === "DALAM_EVALUASI").length,
     selesai: evaluatorReports.filter(r => r.evaluationStatus === "SELESAI").length,
     perluReviewUlang: evaluatorReports.filter(r => r.evaluationStatus === "PERLU_REVIEW_ULANG").length,
-    painPoints: reportClusters.filter(c => c.status === "Duplikat Kuat").length,
   }), [evaluatorReports]);
 
   const handleViewDetail = (report: HazardReport) => {
