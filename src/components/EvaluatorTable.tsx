@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { FileText, Search, Filter, X, Clock, CheckCircle2, AlertCircle, RotateCcw, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileText, Search, Filter, X, Clock, CheckCircle2, AlertCircle, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -54,13 +54,6 @@ const getEvaluationStatusBadge = (status: EvaluationStatus) => {
         <Badge variant="outline" className="bg-success/10 text-success border-success/30 gap-1 whitespace-nowrap">
           <CheckCircle2 className="w-3 h-3" />
           Selesai
-        </Badge>
-      );
-    case "PERLU_REVIEW_ULANG":
-      return (
-        <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30 gap-1 whitespace-nowrap">
-          <RotateCcw className="w-3 h-3" />
-          Perlu Review
         </Badge>
       );
     default:
