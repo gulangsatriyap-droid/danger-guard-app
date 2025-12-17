@@ -261,29 +261,119 @@ const ClusterPanel = ({ cluster, onClose, onSelectReport }: ClusterPanelProps) =
             )}
           </div>
 
-          {/* Reports in Cluster */}
+          {/* Reports in Cluster with Duplicate Scores */}
           <div>
-            <h4 className="text-sm font-medium text-foreground mb-3">Laporan dalam Cluster</h4>
-            <div className="space-y-2">
+            <h4 className="text-sm font-medium text-foreground mb-3">Laporan dalam Cluster ({clusterReports.length})</h4>
+            <div className="space-y-3">
               {clusterReports.map((report) => (
-                <button
+                <div
                   key={report.id}
-                  onClick={() => onSelectReport(report.id)}
-                  className="w-full p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                  className="p-4 bg-muted/30 rounded-lg border border-border/50"
                 >
-                  <div className="flex items-start gap-3">
-                    <FileText className="w-4 h-4 text-muted-foreground mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">{report.id}</p>
-                      <p className="text-xs text-muted-foreground truncate">{report.deskripsiTemuan}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-muted-foreground">{report.tanggal}</span>
-                        <span className="text-xs text-muted-foreground">•</span>
-                        <span className="text-xs text-muted-foreground">{report.lokasi}</span>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <FileText className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-medium text-foreground">{report.id}</p>
+                          {report.duplicateScores && (
+                            <Badge variant="outline" className={`text-xs ${
+                              report.duplicateScores.overall >= 0.75 ? 'bg-destructive/10 text-destructive border-destructive/20' :
+                              report.duplicateScores.overall >= 0.5 ? 'bg-warning/10 text-warning border-warning/20' :
+                              'bg-success/10 text-success border-success/20'
+                            }`}>
+                              {(report.duplicateScores.overall * 100).toFixed(0)}% Match
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">{report.deskripsiTemuan}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-muted-foreground">{report.tanggal}</span>
+                          <span className="text-xs text-muted-foreground">•</span>
+                          <span className="text-xs text-muted-foreground">{report.lokasi}</span>
+                        </div>
                       </div>
                     </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => onSelectReport(report.id)}
+                      className="shrink-0"
+                    >
+                      Lihat Detail
+                    </Button>
                   </div>
-                </button>
+                  
+                  {/* Duplicate Score Breakdown */}
+                  {report.duplicateScores && (
+                    <div className="mt-3 pt-3 border-t border-border/50">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">Breakdown Skor Duplicate:</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="bg-background/50 rounded p-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">Rule-Based</span>
+                            <span className={`text-xs font-bold ${getScoreColor(report.duplicateScores.ruleBased)}`}>
+                              {(report.duplicateScores.ruleBased * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <Progress value={report.duplicateScores.ruleBased * 100} className="h-1 mt-1" />
+                          <p className="text-[10px] text-muted-foreground mt-1">Kecocokan aturan tetap</p>
+                        </div>
+                        <div className="bg-background/50 rounded p-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">Geo</span>
+                            <span className={`text-xs font-bold ${getScoreColor(report.duplicateScores.geo)}`}>
+                              {(report.duplicateScores.geo * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <Progress value={report.duplicateScores.geo * 100} className="h-1 mt-1" />
+                          <p className="text-[10px] text-muted-foreground mt-1">Kedekatan lokasi</p>
+                        </div>
+                        <div className="bg-background/50 rounded p-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">Lexical</span>
+                            <span className={`text-xs font-bold ${getScoreColor(report.duplicateScores.lexical)}`}>
+                              {(report.duplicateScores.lexical * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <Progress value={report.duplicateScores.lexical * 100} className="h-1 mt-1" />
+                          <p className="text-[10px] text-muted-foreground mt-1">Kesamaan kata</p>
+                        </div>
+                        <div className="bg-background/50 rounded p-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">Semantic</span>
+                            <span className={`text-xs font-bold ${getScoreColor(report.duplicateScores.semantic)}`}>
+                              {(report.duplicateScores.semantic * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <Progress value={report.duplicateScores.semantic * 100} className="h-1 mt-1" />
+                          <p className="text-[10px] text-muted-foreground mt-1">Kesamaan makna</p>
+                        </div>
+                      </div>
+                      
+                      {/* Reasoning/Explanation */}
+                      <div className="mt-2 p-2 bg-info/5 rounded border border-info/20">
+                        <p className="text-xs text-info font-medium mb-1">💡 Alasan Duplicate:</p>
+                        <p className="text-xs text-muted-foreground">
+                          {report.duplicateScores.overall >= 0.75 
+                            ? `Laporan ini memiliki kemiripan tinggi (${(report.duplicateScores.overall * 100).toFixed(0)}%) dengan laporan lain dalam cluster. Kecocokan terkuat pada ${
+                                report.duplicateScores.ruleBased >= report.duplicateScores.geo && report.duplicateScores.ruleBased >= report.duplicateScores.lexical && report.duplicateScores.ruleBased >= report.duplicateScores.semantic 
+                                ? 'aturan tetap (rule-based)' 
+                                : report.duplicateScores.geo >= report.duplicateScores.lexical && report.duplicateScores.geo >= report.duplicateScores.semantic 
+                                ? 'lokasi geografis' 
+                                : report.duplicateScores.lexical >= report.duplicateScores.semantic 
+                                ? 'kesamaan kata' 
+                                : 'kesamaan makna'
+                              }.`
+                            : report.duplicateScores.overall >= 0.5
+                            ? `Laporan ini mungkin duplicate (${(report.duplicateScores.overall * 100).toFixed(0)}%). Perlu validasi manual untuk memastikan.`
+                            : `Laporan ini memiliki kemiripan rendah (${(report.duplicateScores.overall * 100).toFixed(0)}%). Kemungkinan bukan duplicate.`
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))}
               {clusterReports.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">

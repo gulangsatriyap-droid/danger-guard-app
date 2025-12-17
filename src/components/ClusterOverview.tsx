@@ -130,69 +130,139 @@ const ClusterOverview = ({ clusters, onSelectReport }: ClusterOverviewProps) => 
 
                 {/* Expanded Content */}
                 {isExpanded && (
-                  <div className="px-4 pb-4 space-y-2 animate-fade-in">
-                    <div className="ml-11 space-y-2">
+                  <div className="px-4 pb-4 space-y-3 animate-fade-in">
+                    <div className="ml-11 space-y-3">
+                      {/* Cluster Score Summary */}
+                      <div className="p-3 bg-muted/20 rounded-lg border border-border/50">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-medium text-muted-foreground">Skor Kemiripan Cluster</span>
+                          <span className={`text-lg font-bold ${
+                            cluster.similarityScore >= 0.75 ? 'text-destructive' :
+                            cluster.similarityScore >= 0.5 ? 'text-warning' : 'text-success'
+                          }`}>
+                            {(cluster.similarityScore * 100).toFixed(0)}%
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2 text-xs">
+                          <div className="text-center p-1.5 bg-background/50 rounded">
+                            <div className="font-bold text-foreground">{(cluster.components.locationRadius * 100).toFixed(0)}%</div>
+                            <div className="text-muted-foreground text-[10px]">Rule-Based</div>
+                          </div>
+                          <div className="text-center p-1.5 bg-background/50 rounded">
+                            <div className="font-bold text-foreground">{(cluster.components.locationName * 100).toFixed(0)}%</div>
+                            <div className="text-muted-foreground text-[10px]">Geo</div>
+                          </div>
+                          <div className="text-center p-1.5 bg-background/50 rounded">
+                            <div className="font-bold text-foreground">{(cluster.components.nonCompliance * 100).toFixed(0)}%</div>
+                            <div className="text-muted-foreground text-[10px]">Lexical</div>
+                          </div>
+                          <div className="text-center p-1.5 bg-background/50 rounded">
+                            <div className="font-bold text-foreground">{(cluster.components.findingDescription * 100).toFixed(0)}%</div>
+                            <div className="text-muted-foreground text-[10px]">Semantic</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Reports List */}
                       {clusterReports.length > 0 ? (
                         <>
                           {clusterReports.map((report) => (
                             <div 
                               key={report.id}
-                              className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+                              className="p-3 bg-muted/30 rounded-lg hover:bg-muted/40 transition-colors border border-border/30"
                             >
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="text-sm font-medium text-foreground">{report.id}</span>
-                                  {report.labels?.map(label => (
-                                    <span 
-                                      key={label}
-                                      className={`text-xs px-1.5 py-0.5 rounded border font-medium ${getLabelColor(label)}`}
-                                    >
-                                      {label}
-                                    </span>
-                                  ))}
-                                  {report.duplicateScores && (
-                                    <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${
-                                      report.duplicateScores.overall >= 0.75 ? 'bg-destructive/10 text-destructive border-destructive/20' :
-                                      report.duplicateScores.overall >= 0.5 ? 'bg-warning/10 text-warning border-warning/20' :
-                                      'bg-success/10 text-success border-success/20'
-                                    }`}>
-                                      {(report.duplicateScores.overall * 100).toFixed(0)}% match
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-muted-foreground truncate mt-0.5">{report.deskripsiTemuan}</p>
-                                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                  <span className="text-xs text-muted-foreground">{report.tanggal}</span>
-                                  <span className="text-xs text-muted-foreground">•</span>
-                                  <span className="text-xs text-muted-foreground">{report.pelapor}</span>
-                                  {report.duplicateScores && (
-                                    <>
-                                      <span className="text-xs text-muted-foreground">•</span>
-                                      <span className="text-xs text-muted-foreground">
-                                        R:{(report.duplicateScores.ruleBased * 100).toFixed(0)}% G:{(report.duplicateScores.geo * 100).toFixed(0)}% L:{(report.duplicateScores.lexical * 100).toFixed(0)}% S:{(report.duplicateScores.semantic * 100).toFixed(0)}%
+                              <div className="flex items-start gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-sm font-medium text-foreground">{report.id}</span>
+                                    {report.labels?.map(label => (
+                                      <span 
+                                        key={label}
+                                        className={`text-xs px-1.5 py-0.5 rounded border font-medium ${getLabelColor(label)}`}
+                                      >
+                                        {label}
                                       </span>
-                                    </>
+                                    ))}
+                                    {report.duplicateScores && (
+                                      <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${
+                                        report.duplicateScores.overall >= 0.75 ? 'bg-destructive/10 text-destructive border-destructive/20' :
+                                        report.duplicateScores.overall >= 0.5 ? 'bg-warning/10 text-warning border-warning/20' :
+                                        'bg-success/10 text-success border-success/20'
+                                      }`}>
+                                        {(report.duplicateScores.overall * 100).toFixed(0)}% match
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mt-1">{report.deskripsiTemuan}</p>
+                                  
+                                  {/* Detailed Scores */}
+                                  {report.duplicateScores && (
+                                    <div className="mt-2 p-2 bg-background/50 rounded border border-border/30">
+                                      <div className="grid grid-cols-4 gap-2 text-xs">
+                                        <div>
+                                          <span className="text-muted-foreground">Rule:</span>
+                                          <span className={`ml-1 font-bold ${
+                                            report.duplicateScores.ruleBased >= 0.75 ? 'text-destructive' :
+                                            report.duplicateScores.ruleBased >= 0.5 ? 'text-warning' : 'text-success'
+                                          }`}>{(report.duplicateScores.ruleBased * 100).toFixed(0)}%</span>
+                                        </div>
+                                        <div>
+                                          <span className="text-muted-foreground">Geo:</span>
+                                          <span className={`ml-1 font-bold ${
+                                            report.duplicateScores.geo >= 0.75 ? 'text-destructive' :
+                                            report.duplicateScores.geo >= 0.5 ? 'text-warning' : 'text-success'
+                                          }`}>{(report.duplicateScores.geo * 100).toFixed(0)}%</span>
+                                        </div>
+                                        <div>
+                                          <span className="text-muted-foreground">Lex:</span>
+                                          <span className={`ml-1 font-bold ${
+                                            report.duplicateScores.lexical >= 0.75 ? 'text-destructive' :
+                                            report.duplicateScores.lexical >= 0.5 ? 'text-warning' : 'text-success'
+                                          }`}>{(report.duplicateScores.lexical * 100).toFixed(0)}%</span>
+                                        </div>
+                                        <div>
+                                          <span className="text-muted-foreground">Sem:</span>
+                                          <span className={`ml-1 font-bold ${
+                                            report.duplicateScores.semantic >= 0.75 ? 'text-destructive' :
+                                            report.duplicateScores.semantic >= 0.5 ? 'text-warning' : 'text-success'
+                                          }`}>{(report.duplicateScores.semantic * 100).toFixed(0)}%</span>
+                                        </div>
+                                      </div>
+                                      <p className="text-[10px] text-info mt-1">
+                                        💡 {report.duplicateScores.overall >= 0.75 
+                                          ? 'Kemiripan tinggi - kemungkinan besar duplicate' 
+                                          : report.duplicateScores.overall >= 0.5 
+                                          ? 'Kemiripan sedang - perlu validasi manual' 
+                                          : 'Kemiripan rendah - kemungkinan bukan duplicate'}
+                                      </p>
+                                    </div>
                                   )}
+                                  
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <span className="text-xs text-muted-foreground">{report.tanggal}</span>
+                                    <span className="text-xs text-muted-foreground">•</span>
+                                    <span className="text-xs text-muted-foreground">{report.pelapor}</span>
+                                  </div>
                                 </div>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => onSelectReport(report)}
+                                  className="gap-1 shrink-0"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                  Detail
+                                </Button>
                               </div>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => onSelectReport(report)}
-                                className="gap-1 text-primary"
-                              >
-                                <Eye className="w-3.5 h-3.5" />
-                                Lihat
-                              </Button>
                             </div>
                           ))}
                           <Button 
-                            variant="outline" 
+                            variant="default" 
                             size="sm" 
                             className="w-full mt-2"
                             onClick={() => setViewingCluster(cluster)}
                           >
-                            Lihat Detail Cluster
+                            Lihat Analisis Detail Cluster
                           </Button>
                         </>
                       ) : (
