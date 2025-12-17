@@ -265,10 +265,30 @@ const AIDuplicateQueueTable = ({ reports, onViewDetail }: AIDuplicateQueueTableP
               <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap">Site</th>
               <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap">Lokasi</th>
               <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap">Duplicate Score</th>
-              <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap w-[100px]">Rule-Based</th>
-              <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap w-[80px]">Geo</th>
-              <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap w-[80px]">Lexical</th>
-              <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap w-[80px]">Semantic</th>
+              <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap w-[100px]">
+                <Tooltip>
+                  <TooltipTrigger className="cursor-help underline decoration-dotted">Rule-Based</TooltipTrigger>
+                  <TooltipContent><p className="text-xs max-w-[200px]">Kecocokan berdasarkan aturan tetap (site, ketidaksesuaian, dll)</p></TooltipContent>
+                </Tooltip>
+              </th>
+              <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap w-[80px]">
+                <Tooltip>
+                  <TooltipTrigger className="cursor-help underline decoration-dotted">Geo</TooltipTrigger>
+                  <TooltipContent><p className="text-xs max-w-[200px]">Kedekatan lokasi geografis (radius ≤1km)</p></TooltipContent>
+                </Tooltip>
+              </th>
+              <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap w-[80px]">
+                <Tooltip>
+                  <TooltipTrigger className="cursor-help underline decoration-dotted">Lexical</TooltipTrigger>
+                  <TooltipContent><p className="text-xs max-w-[200px]">Kesamaan kata/teks dalam deskripsi</p></TooltipContent>
+                </Tooltip>
+              </th>
+              <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap w-[80px]">
+                <Tooltip>
+                  <TooltipTrigger className="cursor-help underline decoration-dotted">Semantic</TooltipTrigger>
+                  <TooltipContent><p className="text-xs max-w-[200px]">Kesamaan makna menggunakan AI embedding</p></TooltipContent>
+                </Tooltip>
+              </th>
               <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2 whitespace-nowrap">Status</th>
             </tr>
           </thead>
@@ -292,40 +312,96 @@ const AIDuplicateQueueTable = ({ reports, onViewDetail }: AIDuplicateQueueTableP
                   <td className="px-3 py-2 text-foreground text-xs whitespace-nowrap">{report.lokasiArea || "-"}</td>
                   <td className="px-3 py-2">
                     {report.duplicateScores?.overall !== undefined ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full ${getProgressColor(report.duplicateScores.overall)}`}
-                            style={{ width: `${report.duplicateScores.overall * 100}%` }}
-                          />
-                        </div>
-                        <span className={`text-xs font-medium ${getScoreColor(report.duplicateScores.overall)}`}>
-                          {(report.duplicateScores.overall * 100).toFixed(0)}%
-                        </span>
-                      </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-2 cursor-help">
+                            <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full ${getProgressColor(report.duplicateScores.overall)}`}
+                                style={{ width: `${report.duplicateScores.overall * 100}%` }}
+                              />
+                            </div>
+                            <span className={`text-xs font-medium ${getScoreColor(report.duplicateScores.overall)}`}>
+                              {(report.duplicateScores.overall * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-[250px]">
+                          <p className="text-xs font-medium mb-1">
+                            {report.duplicateScores.overall >= 0.75 
+                              ? '🔴 Duplicate Kuat' 
+                              : report.duplicateScores.overall >= 0.5 
+                              ? '🟡 Mungkin Duplicate' 
+                              : '🟢 Bukan Duplicate'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {report.duplicateScores.overall >= 0.75 
+                              ? 'Kemungkinan besar laporan ini duplicate dengan laporan lain' 
+                              : report.duplicateScores.overall >= 0.5 
+                              ? 'Perlu validasi manual untuk memastikan' 
+                              : 'Kemungkinan besar bukan duplicate'}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
                     ) : (
                       <span className="text-xs text-muted-foreground">-</span>
                     )}
                   </td>
                   <td className="px-3 py-2">
-                    <span className={`text-xs ${report.duplicateScores?.ruleBased !== undefined ? getScoreColor(report.duplicateScores.ruleBased) : 'text-muted-foreground'}`}>
-                      {report.duplicateScores?.ruleBased !== undefined ? `${(report.duplicateScores.ruleBased * 100).toFixed(0)}%` : '-'}
-                    </span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className={`text-xs cursor-help ${report.duplicateScores?.ruleBased !== undefined ? getScoreColor(report.duplicateScores.ruleBased) : 'text-muted-foreground'}`}>
+                          {report.duplicateScores?.ruleBased !== undefined ? `${(report.duplicateScores.ruleBased * 100).toFixed(0)}%` : '-'}
+                        </span>
+                      </TooltipTrigger>
+                      {report.duplicateScores?.ruleBased !== undefined && (
+                        <TooltipContent>
+                          <p className="text-xs">Kecocokan aturan tetap: {(report.duplicateScores.ruleBased * 100).toFixed(0)}%</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </td>
                   <td className="px-3 py-2">
-                    <span className={`text-xs ${report.duplicateScores?.geo !== undefined ? getScoreColor(report.duplicateScores.geo) : 'text-muted-foreground'}`}>
-                      {report.duplicateScores?.geo !== undefined ? `${(report.duplicateScores.geo * 100).toFixed(0)}%` : '-'}
-                    </span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className={`text-xs cursor-help ${report.duplicateScores?.geo !== undefined ? getScoreColor(report.duplicateScores.geo) : 'text-muted-foreground'}`}>
+                          {report.duplicateScores?.geo !== undefined ? `${(report.duplicateScores.geo * 100).toFixed(0)}%` : '-'}
+                        </span>
+                      </TooltipTrigger>
+                      {report.duplicateScores?.geo !== undefined && (
+                        <TooltipContent>
+                          <p className="text-xs">Kedekatan lokasi: {(report.duplicateScores.geo * 100).toFixed(0)}%</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </td>
                   <td className="px-3 py-2">
-                    <span className={`text-xs ${report.duplicateScores?.lexical !== undefined ? getScoreColor(report.duplicateScores.lexical) : 'text-muted-foreground'}`}>
-                      {report.duplicateScores?.lexical !== undefined ? `${(report.duplicateScores.lexical * 100).toFixed(0)}%` : '-'}
-                    </span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className={`text-xs cursor-help ${report.duplicateScores?.lexical !== undefined ? getScoreColor(report.duplicateScores.lexical) : 'text-muted-foreground'}`}>
+                          {report.duplicateScores?.lexical !== undefined ? `${(report.duplicateScores.lexical * 100).toFixed(0)}%` : '-'}
+                        </span>
+                      </TooltipTrigger>
+                      {report.duplicateScores?.lexical !== undefined && (
+                        <TooltipContent>
+                          <p className="text-xs">Kesamaan kata: {(report.duplicateScores.lexical * 100).toFixed(0)}%</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </td>
                   <td className="px-3 py-2">
-                    <span className={`text-xs ${report.duplicateScores?.semantic !== undefined ? getScoreColor(report.duplicateScores.semantic) : 'text-muted-foreground'}`}>
-                      {report.duplicateScores?.semantic !== undefined ? `${(report.duplicateScores.semantic * 100).toFixed(0)}%` : '-'}
-                    </span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className={`text-xs cursor-help ${report.duplicateScores?.semantic !== undefined ? getScoreColor(report.duplicateScores.semantic) : 'text-muted-foreground'}`}>
+                          {report.duplicateScores?.semantic !== undefined ? `${(report.duplicateScores.semantic * 100).toFixed(0)}%` : '-'}
+                        </span>
+                      </TooltipTrigger>
+                      {report.duplicateScores?.semantic !== undefined && (
+                        <TooltipContent>
+                          <p className="text-xs">Kesamaan makna: {(report.duplicateScores.semantic * 100).toFixed(0)}%</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </td>
                   <td className="px-3 py-2">
                     {getDuplicateStatusBadge(report.duplicateStatus)}
