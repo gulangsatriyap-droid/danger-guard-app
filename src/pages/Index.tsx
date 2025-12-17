@@ -3,6 +3,7 @@ import { ArrowLeft, Bot, FileText, Layers, ClipboardCheck } from "lucide-react";
 import Header from "@/components/Header";
 import AppSidebar from "@/components/AppSidebar";
 import AIQueueTable from "@/components/AIQueueTable";
+import AIDuplicateQueueTable from "@/components/AIDuplicateQueueTable";
 import EvaluatorTable from "@/components/EvaluatorTable";
 import ReportDetail from "@/components/ReportDetail";
 import ReportListPanel from "@/components/ReportListPanel";
@@ -10,7 +11,7 @@ import ClusterOverview from "@/components/ClusterOverview";
 import AIPipelineSummary from "@/components/AIPipelineSummary";
 import EvaluatorSummary from "@/components/EvaluatorSummary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { hazardReports, aiQueueReports, dashboardStats, HazardReport, reportClusters } from "@/data/hazardReports";
+import { hazardReports, aiQueueReports, aiDuplicateQueueReports, dashboardStats, HazardReport, reportClusters } from "@/data/hazardReports";
 
 const Index = () => {
   const [selectedReport, setSelectedReport] = useState<HazardReport | null>(null);
@@ -116,6 +117,13 @@ const Index = () => {
                       {queueReports.length}
                     </span>
                   </TabsTrigger>
+                  <TabsTrigger value="ai-duplicate" className="gap-2 px-6">
+                    <Layers className="w-4 h-4" />
+                    AI Duplicate
+                    <span className="ml-1 px-1.5 py-0.5 bg-info/20 text-info rounded text-xs font-medium">
+                      {aiDuplicateQueueReports.length}
+                    </span>
+                  </TabsTrigger>
                 </TabsList>
 
                 {/* Evaluasi Tab Content */}
@@ -135,7 +143,7 @@ const Index = () => {
                       </TabsTrigger>
                       <TabsTrigger value="clusters" className="gap-2">
                         <Layers className="w-4 h-4" />
-                        Cluster & Pain Points
+                        Duplicate Hazard
                       </TabsTrigger>
                     </TabsList>
 
@@ -162,6 +170,11 @@ const Index = () => {
 
                   {/* AI Queue */}
                   <AIQueueTable reports={queueReports} />
+                </TabsContent>
+
+                {/* AI Duplicate Tab Content */}
+                <TabsContent value="ai-duplicate" className="space-y-6">
+                  <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
                 </TabsContent>
               </Tabs>
             </div>

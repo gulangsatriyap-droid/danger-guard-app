@@ -87,6 +87,9 @@ const EvaluatorTable = ({ reports, onViewDetail }: EvaluatorTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   
+  // Default timestamp filter to last 7 days
+  const [timestampFilter, setTimestampFilter] = useState<string>("7days");
+  
   // Location filters
   const [siteFilter, setSiteFilter] = useState<string>("all");
   const [lokasiAreaFilter, setLokasiAreaFilter] = useState<string>("all");
@@ -172,6 +175,17 @@ const EvaluatorTable = ({ reports, onViewDetail }: EvaluatorTableProps) => {
 
   // Filter reports
   const filteredAndSortedReports = useMemo(() => {
+    // Calculate date threshold for timestamp filter
+    const now = new Date();
+    let dateThreshold: Date | null = null;
+    if (timestampFilter === "7days") {
+      dateThreshold = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    } else if (timestampFilter === "30days") {
+      dateThreshold = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    } else if (timestampFilter === "90days") {
+      dateThreshold = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    }
+
     const filtered = reports.filter(report => {
       const matchesSearch = searchTerm === "" || 
         report.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -196,7 +210,14 @@ const EvaluatorTable = ({ reports, onViewDetail }: EvaluatorTableProps) => {
       const matchesSubKetidaksesuaian = selectedSubKetidaksesuaian.length === 0 || 
         (report.subKetidaksesuaian && selectedSubKetidaksesuaian.includes(report.subKetidaksesuaian));
 
-      return matchesSearch && matchesLabel && matchesSite && matchesLokasiArea && matchesDetailLokasi && matchesHazard && matchesKetidaksesuaian && matchesSubKetidaksesuaian;
+      // Timestamp filter
+      let matchesTimestamp = true;
+      if (dateThreshold && report.timestamp) {
+        const reportDate = new Date(report.timestamp);
+        matchesTimestamp = reportDate >= dateThreshold;
+      }
+
+      return matchesSearch && matchesLabel && matchesSite && matchesLokasiArea && matchesDetailLokasi && matchesHazard && matchesKetidaksesuaian && matchesSubKetidaksesuaian && matchesTimestamp;
     });
 
     // Sort by timestamp
@@ -205,7 +226,7 @@ const EvaluatorTable = ({ reports, onViewDetail }: EvaluatorTableProps) => {
       const timeB = b.timestamp ? new Date(b.timestamp).getTime() : new Date(b.tanggal).getTime();
       return sortOrder === "asc" ? timeA - timeB : timeB - timeA;
     });
-  }, [reports, searchTerm, selectedLabels, siteFilter, lokasiAreaFilter, detailLokasiFilter, hazardFilter, selectedKetidaksesuaian, selectedSubKetidaksesuaian, sortOrder]);
+  }, [reports, searchTerm, selectedLabels, siteFilter, lokasiAreaFilter, detailLokasiFilter, hazardFilter, selectedKetidaksesuaian, selectedSubKetidaksesuaian, sortOrder, timestampFilter]);
 
   const handleLabelToggle = (label: string) => {
     setSelectedLabels(prev => 
@@ -226,10 +247,11 @@ const EvaluatorTable = ({ reports, onViewDetail }: EvaluatorTableProps) => {
     setSelectedSubKetidaksesuaian([]);
     setSearchTerm("");
     setSortOrder("desc");
+    setTimestampFilter("7days");
     setCurrentPage(1);
   };
 
-  const hasActiveFilters = selectedLabels.length > 0 || siteFilter !== "all" || lokasiAreaFilter !== "all" || detailLokasiFilter !== "all" || hazardFilter !== "all" || selectedKetidaksesuaian.length > 0 || selectedSubKetidaksesuaian.length > 0 || searchTerm !== "";
+  const hasActiveFilters = selectedLabels.length > 0 || siteFilter !== "all" || lokasiAreaFilter !== "all" || detailLokasiFilter !== "all" || hazardFilter !== "all" || selectedKetidaksesuaian.length > 0 || selectedSubKetidaksesuaian.length > 0 || searchTerm !== "" || timestampFilter !== "7days";
 
   const toggleSortOrder = () => {
     setSortOrder(prev => prev === "asc" ? "desc" : "asc");
@@ -304,6 +326,19 @@ const EvaluatorTable = ({ reports, onViewDetail }: EvaluatorTableProps) => {
           </div>
 
           <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+
+          {/* Timestamp Filter */}
+          <Select value={timestampFilter} onValueChange={(v) => { setTimestampFilter(v); setCurrentPage(1); }}>
+            <SelectTrigger className="w-[110px] h-8 text-xs">
+              <SelectValue placeholder="Periode" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Waktu</SelectItem>
+              <SelectItem value="7days">7 Hari Terakhir</SelectItem>
+              <SelectItem value="30days">30 Hari Terakhir</SelectItem>
+              <SelectItem value="90days">90 Hari Terakhir</SelectItem>
+            </SelectContent>
+          </Select>
 
           {/* Hazard Type Filter */}
           <Select value={hazardFilter} onValueChange={(v) => { setHazardFilter(v); setCurrentPage(1); }}>

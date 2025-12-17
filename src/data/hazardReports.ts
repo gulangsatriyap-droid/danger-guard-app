@@ -32,6 +32,18 @@ export interface ClusterInfo {
 // AI Processing Status (only for Antrian AI)
 export type AIStatus = 'MENUNGGU_ANALISIS_AI' | 'SEDANG_ANALISIS_AI' | 'AI_GAGAL' | 'AI_SELESAI';
 
+// Duplicate Detection Status
+export type DuplicateStatus = 'MENUNGGU_ANALISIS_DUPLICATE' | 'SEDANG_ANALISIS_DUPLICATE' | 'DUPLICATE_SELESAI';
+
+// Duplicate Scores Interface
+export interface DuplicateScores {
+  overall: number;      // Combined score
+  ruleBased: number;    // Rule-based matching score
+  geo: number;          // Geographic/location similarity
+  lexical: number;      // Word-level similarity
+  semantic: number;     // Meaning-level similarity
+}
+
 // Evaluation Status (only for Daftar Laporan post-AI)
 export type EvaluationStatus = 'BELUM_DIEVALUASI' | 'DALAM_EVALUASI' | 'SELESAI' | 'PERLU_REVIEW_ULANG';
 
@@ -78,6 +90,10 @@ export interface HazardReport {
   slaStatus?: SLAStatus;
   slaDueDate?: string;
   assignedTo?: string;
+  
+  // Duplicate detection fields
+  duplicateStatus?: DuplicateStatus;
+  duplicateScores?: DuplicateScores;
 }
 
 // Cluster data with similarity scoring based on the clustering rules
@@ -388,6 +404,13 @@ export const hazardReports: HazardReport[] = [
     slaStatus: "hijau",
     slaDueDate: "10 Des 2025",
     clusterSuggestion: "C-005",
+    duplicateScores: {
+      overall: 0.78,
+      ruleBased: 0.85,
+      geo: 0.90,
+      lexical: 0.65,
+      semantic: 0.72
+    },
     aiKnowledgeSources: [
       {
         type: 'TBC',
@@ -451,7 +474,14 @@ export const hazardReports: HazardReport[] = [
     confidenceScore: 88,
     evaluationStatus: "BELUM_DIEVALUASI",
     slaStatus: "kuning",
-    slaDueDate: "09 Des 2025"
+    slaDueDate: "09 Des 2025",
+    duplicateScores: {
+      overall: 0.65,
+      ruleBased: 0.70,
+      geo: 0.50,
+      lexical: 0.60,
+      semantic: 0.68
+    }
   },
   {
     id: "HR-2025-336-23917",
@@ -479,7 +509,14 @@ export const hazardReports: HazardReport[] = [
     evaluatorName: "Andi Supervisor",
     slaStatus: "hijau",
     slaDueDate: "11 Des 2025",
-    assignedTo: "Andi Supervisor"
+    assignedTo: "Andi Supervisor",
+    duplicateScores: {
+      overall: 0.87,
+      ruleBased: 0.95,
+      geo: 0.92,
+      lexical: 0.80,
+      semantic: 0.85
+    }
   },
   {
     id: "HR-2025-336-23918",
@@ -506,7 +543,14 @@ export const hazardReports: HazardReport[] = [
     evaluationStatus: "SELESAI",
     evaluatorName: "Budi Evaluator",
     slaStatus: "hijau",
-    slaDueDate: "08 Des 2025"
+    slaDueDate: "08 Des 2025",
+    duplicateScores: {
+      overall: 0.82,
+      ruleBased: 0.90,
+      geo: 0.85,
+      lexical: 0.75,
+      semantic: 0.78
+    }
   },
   {
     id: "HR-2025-336-23919",
@@ -659,3 +703,169 @@ export const dashboardStats = {
   reviewToClosing: 2.6,
   intervalSubmission: 20.4
 };
+
+// AI Duplicate Detection Queue
+export const aiDuplicateQueueReports: HazardReport[] = [
+  {
+    id: "HR-2025-336-23920",
+    tanggal: "11 Des 2025",
+    pelapor: "Rudi Hartono",
+    lokasi: "(B 65) Area Gerbang",
+    lokasiKode: "B65",
+    jenisHazard: "APD",
+    subJenisHazard: "Helm tidak dipakai",
+    cluster: null,
+    site: "MINING PIT",
+    lokasiArea: "Hauling Road",
+    detailLokasi: "Jalur Angkut Pit Selatan",
+    deskripsiTemuan: "Pekerja tidak menggunakan helm safety di area konstruksi.",
+    quickAction: "Warning",
+    tanggalPembuatan: "11 Des 2025",
+    rolePelapor: "Supervisor",
+    aiStatus: "AI_SELESAI",
+    timestamp: "2025-12-11T08:00:00Z",
+    duplicateStatus: "SEDANG_ANALISIS_DUPLICATE",
+    duplicateScores: {
+      overall: 0.78,
+      ruleBased: 0.85,
+      geo: 0.90,
+      lexical: 0.65,
+      semantic: 0.72
+    }
+  },
+  {
+    id: "HR-2025-336-23921",
+    tanggal: "11 Des 2025",
+    pelapor: "Sinta Dewi",
+    lokasi: "(B 65) Area Gerbang",
+    lokasiKode: "B65",
+    jenisHazard: "APD",
+    subJenisHazard: "Helm tidak lengkap",
+    cluster: null,
+    site: "MINING PIT",
+    lokasiArea: "Hauling Road",
+    detailLokasi: "Jalur Angkut Pit Selatan",
+    deskripsiTemuan: "Karyawan tidak memakai helm saat bekerja di area konstruksi.",
+    quickAction: "Safety Briefing",
+    tanggalPembuatan: "11 Des 2025",
+    rolePelapor: "Safety Officer",
+    aiStatus: "AI_SELESAI",
+    timestamp: "2025-12-11T08:15:00Z",
+    duplicateStatus: "MENUNGGU_ANALISIS_DUPLICATE",
+    duplicateScores: {
+      overall: 0.82,
+      ruleBased: 0.90,
+      geo: 0.95,
+      lexical: 0.70,
+      semantic: 0.75
+    }
+  },
+  {
+    id: "HR-2025-336-23922",
+    tanggal: "11 Des 2025",
+    pelapor: "Ahmad Fauzi",
+    lokasi: "(B 66) Area Galian",
+    lokasiKode: "B66",
+    jenisHazard: "Jalan",
+    subJenisHazard: "Jalan berlubang",
+    cluster: null,
+    site: "MINING PIT",
+    lokasiArea: "Pit Area",
+    detailLokasi: "Pit 3 Section A",
+    deskripsiTemuan: "Terdapat lubang di jalan hauling sekitar 40cm.",
+    quickAction: "Road Maintenance",
+    tanggalPembuatan: "11 Des 2025",
+    rolePelapor: "Road Inspector",
+    aiStatus: "AI_SELESAI",
+    timestamp: "2025-12-11T09:00:00Z",
+    duplicateStatus: "MENUNGGU_ANALISIS_DUPLICATE",
+    duplicateScores: {
+      overall: 0.65,
+      ruleBased: 0.70,
+      geo: 0.80,
+      lexical: 0.55,
+      semantic: 0.60
+    }
+  },
+  {
+    id: "HR-2025-336-23923",
+    tanggal: "10 Des 2025",
+    pelapor: "Budi Santoso",
+    lokasi: "(B 67) Workshop",
+    lokasiKode: "B67",
+    jenisHazard: "APD",
+    subJenisHazard: "Sarung tangan",
+    cluster: null,
+    site: "OFFICE AREA",
+    lokasiArea: "Workshop",
+    detailLokasi: "Workshop Utama",
+    deskripsiTemuan: "Teknisi tidak menggunakan sarung tangan saat bekerja.",
+    quickAction: "APD Check",
+    tanggalPembuatan: "10 Des 2025",
+    rolePelapor: "Teknisi Senior",
+    aiStatus: "AI_SELESAI",
+    timestamp: "2025-12-10T10:30:00Z",
+    duplicateStatus: "MENUNGGU_ANALISIS_DUPLICATE",
+    duplicateScores: {
+      overall: 0.45,
+      ruleBased: 0.50,
+      geo: 0.40,
+      lexical: 0.45,
+      semantic: 0.48
+    }
+  },
+  {
+    id: "HR-2025-336-23924",
+    tanggal: "10 Des 2025",
+    pelapor: "Eka Putra",
+    lokasi: "(B 65) Area Gerbang",
+    lokasiKode: "B65",
+    jenisHazard: "Kecepatan",
+    subJenisHazard: "Speeding",
+    cluster: null,
+    site: "MINING PIT",
+    lokasiArea: "Hauling Road",
+    detailLokasi: "Gerbang Utama Site",
+    deskripsiTemuan: "Kendaraan melaju kencang di area gerbang.",
+    quickAction: "Warning",
+    tanggalPembuatan: "10 Des 2025",
+    rolePelapor: "Gate Keeper",
+    aiStatus: "AI_SELESAI",
+    timestamp: "2025-12-10T11:00:00Z",
+    duplicateStatus: "MENUNGGU_ANALISIS_DUPLICATE",
+    duplicateScores: {
+      overall: 0.88,
+      ruleBased: 0.95,
+      geo: 0.92,
+      lexical: 0.80,
+      semantic: 0.85
+    }
+  },
+  {
+    id: "HR-2025-336-23925",
+    tanggal: "10 Des 2025",
+    pelapor: "Agus Wijaya",
+    lokasi: "(B 69) Jalan Hauling",
+    lokasiKode: "B69",
+    jenisHazard: "Kecepatan",
+    subJenisHazard: "Over Speed",
+    cluster: null,
+    site: "MINING PIT",
+    lokasiArea: "Hauling Road",
+    detailLokasi: "Jalur Angkut Pit Utara",
+    deskripsiTemuan: "LV melaju 50 km/jam di zona 30 km/jam dekat gerbang.",
+    quickAction: "Warning Letter",
+    tanggalPembuatan: "10 Des 2025",
+    rolePelapor: "Security",
+    aiStatus: "AI_SELESAI",
+    timestamp: "2025-12-10T11:30:00Z",
+    duplicateStatus: "MENUNGGU_ANALISIS_DUPLICATE",
+    duplicateScores: {
+      overall: 0.91,
+      ruleBased: 0.95,
+      geo: 0.88,
+      lexical: 0.90,
+      semantic: 0.92
+    }
+  }
+];

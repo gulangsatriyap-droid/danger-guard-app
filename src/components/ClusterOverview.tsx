@@ -68,10 +68,10 @@ const ClusterOverview = ({ clusters, onSelectReport }: ClusterOverviewProps) => 
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Cluster Analysis</h2>
+            <h2 className="text-lg font-semibold text-foreground">Duplicate Hazard Analysis</h2>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            {clusters.length} cluster terdeteksi • {clusters.filter(c => c.status === 'Duplikat Kuat').length} duplikat kuat
+            {clusters.length} cluster terdeteksi • {clusters.filter(c => c.status === 'Duplikat Kuat').length} duplikat kuat • Skor berdasarkan Rule-based, Geo, Lexical, Semantic
           </p>
         </div>
 
@@ -150,12 +150,29 @@ const ClusterOverview = ({ clusters, onSelectReport }: ClusterOverviewProps) => 
                                       {label}
                                     </span>
                                   ))}
+                                  {report.duplicateScores && (
+                                    <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${
+                                      report.duplicateScores.overall >= 0.75 ? 'bg-destructive/10 text-destructive border-destructive/20' :
+                                      report.duplicateScores.overall >= 0.5 ? 'bg-warning/10 text-warning border-warning/20' :
+                                      'bg-success/10 text-success border-success/20'
+                                    }`}>
+                                      {(report.duplicateScores.overall * 100).toFixed(0)}% match
+                                    </span>
+                                  )}
                                 </div>
                                 <p className="text-xs text-muted-foreground truncate mt-0.5">{report.deskripsiTemuan}</p>
-                                <div className="flex items-center gap-2 mt-1">
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
                                   <span className="text-xs text-muted-foreground">{report.tanggal}</span>
                                   <span className="text-xs text-muted-foreground">•</span>
                                   <span className="text-xs text-muted-foreground">{report.pelapor}</span>
+                                  {report.duplicateScores && (
+                                    <>
+                                      <span className="text-xs text-muted-foreground">•</span>
+                                      <span className="text-xs text-muted-foreground">
+                                        R:{(report.duplicateScores.ruleBased * 100).toFixed(0)}% G:{(report.duplicateScores.geo * 100).toFixed(0)}% L:{(report.duplicateScores.lexical * 100).toFixed(0)}% S:{(report.duplicateScores.semantic * 100).toFixed(0)}%
+                                      </span>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                               <Button 
