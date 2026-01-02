@@ -177,18 +177,24 @@ const Index = () => {
                 <TabsContent value="ai-duplicate" className="space-y-6">
                   {/* Sub-tabs for AI Duplicate */}
                   <Tabs value={duplicateSubTab} onValueChange={setDuplicateSubTab}>
-                    <TabsList className="bg-muted/30">
-                      <TabsTrigger value="list" className="gap-2">
+                    <TabsList className="bg-card border border-border shadow-sm rounded-lg p-1">
+                      <TabsTrigger 
+                        value="list" 
+                        className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md px-4 py-2"
+                      >
                         <List className="w-4 h-4" />
                         List Hazard
-                        <span className="ml-1 px-1.5 py-0.5 bg-primary/20 text-primary rounded text-xs font-medium">
+                        <span className="ml-1 px-2 py-0.5 bg-muted text-muted-foreground data-[state=active]:bg-primary/20 data-[state=active]:text-primary rounded-full text-xs font-semibold">
                           {aiDuplicateQueueReports.length}
                         </span>
                       </TabsTrigger>
-                      <TabsTrigger value="cluster" className="gap-2">
+                      <TabsTrigger 
+                        value="cluster" 
+                        className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md px-4 py-2"
+                      >
                         <Layers className="w-4 h-4" />
                         Duplicate Cluster
-                        <span className="ml-1 px-1.5 py-0.5 bg-warning/20 text-warning rounded text-xs font-medium">
+                        <span className="ml-1 px-2 py-0.5 bg-muted text-muted-foreground data-[state=active]:bg-primary/20 data-[state=active]:text-primary rounded-full text-xs font-semibold">
                           {reportClusters.length}
                         </span>
                       </TabsTrigger>
