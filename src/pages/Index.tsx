@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, Bot, FileText, Layers, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, Bot, FileText, Layers, ClipboardCheck, List } from "lucide-react";
 import Header from "@/components/Header";
 import AppSidebar from "@/components/AppSidebar";
 import AIQueueTable from "@/components/AIQueueTable";
@@ -19,6 +19,7 @@ const Index = () => {
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [mainTab, setMainTab] = useState("evaluasi");
   const [evaluasiSubTab, setEvaluasiSubTab] = useState("reports");
+  const [duplicateSubTab, setDuplicateSubTab] = useState("list");
 
   // Filter only post-AI reports (AI_SELESAI)
   const evaluatorReports = useMemo(() => 
@@ -174,7 +175,36 @@ const Index = () => {
 
                 {/* AI Duplicate Tab Content */}
                 <TabsContent value="ai-duplicate" className="space-y-6">
-                  <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
+                  {/* Sub-tabs for AI Duplicate */}
+                  <Tabs value={duplicateSubTab} onValueChange={setDuplicateSubTab}>
+                    <TabsList className="bg-muted/30">
+                      <TabsTrigger value="list" className="gap-2">
+                        <List className="w-4 h-4" />
+                        List Hazard
+                        <span className="ml-1 px-1.5 py-0.5 bg-primary/20 text-primary rounded text-xs font-medium">
+                          {aiDuplicateQueueReports.length}
+                        </span>
+                      </TabsTrigger>
+                      <TabsTrigger value="cluster" className="gap-2">
+                        <Layers className="w-4 h-4" />
+                        Duplicate Cluster
+                        <span className="ml-1 px-1.5 py-0.5 bg-warning/20 text-warning rounded text-xs font-medium">
+                          {reportClusters.length}
+                        </span>
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="list" className="mt-4">
+                      <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
+                    </TabsContent>
+
+                    <TabsContent value="cluster" className="mt-4">
+                      <ClusterOverview 
+                        clusters={reportClusters}
+                        onSelectReport={handleViewDetail}
+                      />
+                    </TabsContent>
+                  </Tabs>
                 </TabsContent>
               </Tabs>
             </div>
