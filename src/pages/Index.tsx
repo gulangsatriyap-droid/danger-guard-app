@@ -4,10 +4,11 @@ import Header from "@/components/Header";
 import AppSidebar from "@/components/AppSidebar";
 import AIQueueTable from "@/components/AIQueueTable";
 import AIDuplicateQueueTable from "@/components/AIDuplicateQueueTable";
+import DuplicateHazardList from "@/components/DuplicateHazardList";
+import DuplicateClusterGrid from "@/components/DuplicateClusterGrid";
 import EvaluatorTable from "@/components/EvaluatorTable";
 import ReportDetail from "@/components/ReportDetail";
 import ReportListPanel from "@/components/ReportListPanel";
-import ClusterOverview from "@/components/ClusterOverview";
 import AIPipelineSummary from "@/components/AIPipelineSummary";
 import EvaluatorSummary from "@/components/EvaluatorSummary";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -182,14 +183,11 @@ const Index = () => {
                         </TabsList>
 
                         <TabsContent value="list" className="mt-4">
-                          <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
+                          <DuplicateHazardList reports={aiDuplicateQueueReports} />
                         </TabsContent>
 
                         <TabsContent value="cluster" className="mt-4">
-                          <ClusterOverview 
-                            clusters={reportClusters}
-                            onSelectReport={handleViewDetail}
-                          />
+                          <DuplicateClusterGrid clusters={reportClusters} />
                         </TabsContent>
                       </Tabs>
                     </TabsContent>
