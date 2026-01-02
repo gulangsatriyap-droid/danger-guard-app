@@ -142,7 +142,7 @@ const Index = () => {
                           {evaluatorReports.length}
                         </span>
                       </TabsTrigger>
-                      <TabsTrigger value="clusters" className="gap-2">
+                      <TabsTrigger value="duplicate" className="gap-2">
                         <Layers className="w-4 h-4" />
                         Duplicate Hazard
                       </TabsTrigger>
@@ -155,11 +155,43 @@ const Index = () => {
                       />
                     </TabsContent>
 
-                    <TabsContent value="clusters" className="mt-4">
-                      <ClusterOverview 
-                        clusters={reportClusters}
-                        onSelectReport={handleViewDetail}
-                      />
+                    <TabsContent value="duplicate" className="mt-4">
+                      {/* Sub-tabs for Duplicate Hazard */}
+                      <Tabs value={duplicateSubTab} onValueChange={setDuplicateSubTab}>
+                        <TabsList className="bg-card border border-border shadow-sm rounded-lg p-1">
+                          <TabsTrigger 
+                            value="list" 
+                            className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md px-4 py-2"
+                          >
+                            <List className="w-4 h-4" />
+                            List Hazard
+                            <span className="ml-1 px-2 py-0.5 bg-muted text-muted-foreground data-[state=active]:bg-primary/20 data-[state=active]:text-primary rounded-full text-xs font-semibold">
+                              {aiDuplicateQueueReports.length}
+                            </span>
+                          </TabsTrigger>
+                          <TabsTrigger 
+                            value="cluster" 
+                            className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md px-4 py-2"
+                          >
+                            <Layers className="w-4 h-4" />
+                            Duplicate Cluster
+                            <span className="ml-1 px-2 py-0.5 bg-muted text-muted-foreground data-[state=active]:bg-primary/20 data-[state=active]:text-primary rounded-full text-xs font-semibold">
+                              {reportClusters.length}
+                            </span>
+                          </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="list" className="mt-4">
+                          <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
+                        </TabsContent>
+
+                        <TabsContent value="cluster" className="mt-4">
+                          <ClusterOverview 
+                            clusters={reportClusters}
+                            onSelectReport={handleViewDetail}
+                          />
+                        </TabsContent>
+                      </Tabs>
                     </TabsContent>
                   </Tabs>
                 </TabsContent>
@@ -175,42 +207,7 @@ const Index = () => {
 
                 {/* AI Duplicate Tab Content */}
                 <TabsContent value="ai-duplicate" className="space-y-6">
-                  {/* Sub-tabs for AI Duplicate */}
-                  <Tabs value={duplicateSubTab} onValueChange={setDuplicateSubTab}>
-                    <TabsList className="bg-card border border-border shadow-sm rounded-lg p-1">
-                      <TabsTrigger 
-                        value="list" 
-                        className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md px-4 py-2"
-                      >
-                        <List className="w-4 h-4" />
-                        List Hazard
-                        <span className="ml-1 px-2 py-0.5 bg-muted text-muted-foreground data-[state=active]:bg-primary/20 data-[state=active]:text-primary rounded-full text-xs font-semibold">
-                          {aiDuplicateQueueReports.length}
-                        </span>
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="cluster" 
-                        className="gap-2 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md px-4 py-2"
-                      >
-                        <Layers className="w-4 h-4" />
-                        Duplicate Cluster
-                        <span className="ml-1 px-2 py-0.5 bg-muted text-muted-foreground data-[state=active]:bg-primary/20 data-[state=active]:text-primary rounded-full text-xs font-semibold">
-                          {reportClusters.length}
-                        </span>
-                      </TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="list" className="mt-4">
-                      <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
-                    </TabsContent>
-
-                    <TabsContent value="cluster" className="mt-4">
-                      <ClusterOverview 
-                        clusters={reportClusters}
-                        onSelectReport={handleViewDetail}
-                      />
-                    </TabsContent>
-                  </Tabs>
+                  <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
                 </TabsContent>
               </Tabs>
             </div>
