@@ -1,5 +1,4 @@
-import { Layers, Users, Image, Eye, MapPin, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Layers, Users, Image, MapPin, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ClusterInfo, hazardReports } from "@/data/hazardReports";
 
@@ -21,7 +20,10 @@ const DuplicateClusterCard = ({ cluster, onViewDetail }: DuplicateClusterCardPro
   const lexClusterId = `LCL-${cluster.id.replace('CL-', '')}`;
 
   return (
-    <div className="bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all hover:border-primary/30">
+    <div 
+      className="bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all hover:border-primary/30 cursor-pointer"
+      onClick={() => onViewDetail(cluster)}
+    >
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
@@ -88,15 +90,6 @@ const DuplicateClusterCard = ({ cluster, onViewDetail }: DuplicateClusterCardPro
           </div>
         </div>
 
-        {/* View Detail Button */}
-        <Button 
-          variant="outline" 
-          className="w-full gap-2 border-border hover:border-primary/50 hover:bg-primary/5"
-          onClick={() => onViewDetail(cluster)}
-        >
-          <Eye className="w-4 h-4" />
-          Lihat Detail
-        </Button>
       </div>
     </div>
   );
