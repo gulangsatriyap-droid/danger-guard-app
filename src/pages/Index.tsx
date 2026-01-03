@@ -21,6 +21,7 @@ const Index = () => {
   const [mainTab, setMainTab] = useState("evaluasi");
   const [evaluasiSubTab, setEvaluasiSubTab] = useState("reports");
   const [duplicateSubTab, setDuplicateSubTab] = useState("list");
+  const [queueSubTab, setQueueSubTab] = useState("ai-labeling");
 
   // Filter only post-AI reports (AI_SELESAI)
   const evaluatorReports = useMemo(() => 
@@ -112,18 +113,11 @@ const Index = () => {
                       {evaluatorReports.length}
                     </span>
                   </TabsTrigger>
-                  <TabsTrigger value="ai-labeling" className="gap-2 px-6">
+                  <TabsTrigger value="queue" className="gap-2 px-6">
                     <Bot className="w-4 h-4" />
-                    AI Labeling
+                    Queue
                     <span className="ml-1 px-1.5 py-0.5 bg-warning/20 text-warning rounded text-xs font-medium">
-                      {queueReports.length}
-                    </span>
-                  </TabsTrigger>
-                  <TabsTrigger value="ai-duplicate" className="gap-2 px-6">
-                    <Layers className="w-4 h-4" />
-                    AI Duplicate
-                    <span className="ml-1 px-1.5 py-0.5 bg-info/20 text-info rounded text-xs font-medium">
-                      {aiDuplicateQueueReports.length}
+                      {queueReports.length + aiDuplicateQueueReports.length}
                     </span>
                   </TabsTrigger>
                 </TabsList>
@@ -194,18 +188,38 @@ const Index = () => {
                   </Tabs>
                 </TabsContent>
 
-                {/* AI Labeling Tab Content */}
-                <TabsContent value="ai-labeling" className="space-y-6">
-                  {/* AI Pipeline Summary */}
-                  <AIPipelineSummary stats={aiPipelineStats} />
+                {/* Queue Tab Content */}
+                <TabsContent value="queue" className="space-y-6">
+                  {/* Sub-tabs for Queue */}
+                  <Tabs value={queueSubTab} onValueChange={setQueueSubTab}>
+                    <TabsList className="bg-muted/30">
+                      <TabsTrigger value="ai-labeling" className="gap-2">
+                        <Bot className="w-4 h-4" />
+                        AI Labeling
+                        <span className="ml-1 px-1.5 py-0.5 bg-warning/20 text-warning rounded text-xs font-medium">
+                          {queueReports.length}
+                        </span>
+                      </TabsTrigger>
+                      <TabsTrigger value="ai-duplicate" className="gap-2">
+                        <Layers className="w-4 h-4" />
+                        AI Duplicate
+                        <span className="ml-1 px-1.5 py-0.5 bg-info/20 text-info rounded text-xs font-medium">
+                          {aiDuplicateQueueReports.length}
+                        </span>
+                      </TabsTrigger>
+                    </TabsList>
 
-                  {/* AI Queue */}
-                  <AIQueueTable reports={queueReports} />
-                </TabsContent>
+                    <TabsContent value="ai-labeling" className="mt-4 space-y-6">
+                      {/* AI Pipeline Summary */}
+                      <AIPipelineSummary stats={aiPipelineStats} />
+                      {/* AI Queue */}
+                      <AIQueueTable reports={queueReports} />
+                    </TabsContent>
 
-                {/* AI Duplicate Tab Content */}
-                <TabsContent value="ai-duplicate" className="space-y-6">
-                  <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
+                    <TabsContent value="ai-duplicate" className="mt-4 space-y-6">
+                      <AIDuplicateQueueTable reports={aiDuplicateQueueReports} />
+                    </TabsContent>
+                  </Tabs>
                 </TabsContent>
               </Tabs>
             </div>
