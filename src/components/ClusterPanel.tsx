@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { X, FileText, Calendar, User, MapPin, Building, Image, Sparkles, Target, ArrowLeft, Navigation, BookText, Zap } from "lucide-react";
+import { X, FileText, Calendar, User, MapPin, Building, Image, Sparkles, Target, ArrowLeft, Navigation, BookText, Zap, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ClusterInfo, hazardReports, HazardReport } from "@/data/hazardReports";
 
 interface ClusterPanelProps {
@@ -456,126 +457,186 @@ const ClusterPanel = ({ cluster, onClose, onSelectReport }: ClusterPanelProps) =
             </div>
           </div>
 
-          {/* GEO CLUSTER Section */}
-          <div className="bg-success/5 rounded-lg p-4 border border-success/20">
-            <div className="flex items-center gap-2 mb-3">
-              <Navigation className="w-4 h-4 text-success" />
-              <span className="font-medium text-sm text-success">Geo Cluster</span>
-              <Badge className={`ml-auto text-xs ${getScoreBgColor(report.duplicateScores?.geo || 0)}`}>
-                {Math.round((report.duplicateScores?.geo || 0) * 100)}%
-              </Badge>
+          {/* Site & Location Info */}
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="text-xs">
+              <Building className="w-3 h-3 mr-1" />
+              {report.site}
+            </Badge>
+            <span className="text-sm text-muted-foreground flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              {report.lokasiArea || report.lokasi}
+            </span>
+          </div>
+
+          {/* Asal Cluster */}
+          <div className="text-xs">
+            <span className="text-muted-foreground">Asal Cluster</span>
+            <p className="text-foreground mt-0.5">{report.cluster ? `Cluster ${report.cluster}` : "Tidak ada cluster sebelumnya"}</p>
+          </div>
+
+          {/* Deskripsi Temuan */}
+          <div className="bg-muted/30 rounded-lg p-4 border-l-4 border-primary/50">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+              <FileText className="w-3 h-3" />
+              <span>Deskripsi Temuan</span>
             </div>
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-xs text-muted-foreground">Site</span>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <Building className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">{report.site}</span>
-                  </div>
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground">Lokasi</span>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">{report.lokasiArea || report.lokasi}</span>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <span className="text-xs text-muted-foreground">Detail Lokasi</span>
-                <p className="text-sm font-medium text-foreground mt-1">{report.detailLokasi}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-xs text-muted-foreground">Longitude</span>
-                  <p className="text-sm font-medium text-foreground mt-1">{report.longitude || "116.8523"}</p>
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground">Latitude</span>
-                  <p className="text-sm font-medium text-foreground mt-1">{report.latitude || "-1.2456"}</p>
-                </div>
-              </div>
+            <p className="text-sm text-foreground">{report.deskripsiTemuan}</p>
+          </div>
+
+          {/* Gambar Temuan */}
+          <div>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+              <Image className="w-3 h-3" />
+              <span>Gambar Temuan (1)</span>
+            </div>
+            <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border border-border">
+              <Image className="w-12 h-12 text-muted-foreground/30" />
             </div>
           </div>
 
-          {/* LEXICAL CLUSTER Section */}
-          <div className="bg-warning/5 rounded-lg p-4 border border-warning/20">
-            <div className="flex items-center gap-2 mb-3">
-              <BookText className="w-4 h-4 text-warning" />
-              <span className="font-medium text-sm text-warning">Lexical Cluster</span>
-              <Badge className={`ml-auto text-xs ${getScoreBgColor(report.duplicateScores?.lexical || 0)}`}>
-                {Math.round((report.duplicateScores?.lexical || 0) * 100)}%
-              </Badge>
-            </div>
-            <div className="space-y-2">
-              <div>
-                <span className="text-xs text-muted-foreground">Ketidaksesuaian</span>
-                <p className="text-sm font-medium text-foreground mt-1">{report.ketidaksesuaian || report.jenisHazard}</p>
+          {/* Expandable Analysis Sections */}
+          <div className="space-y-2">
+            {/* SEMANTIC ANALYSIS - Expandable */}
+            <Collapsible defaultOpen>
+              <div className="bg-primary/5 rounded-lg border border-primary/20 overflow-hidden">
+                <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span className="font-medium text-sm text-primary">Analisis Semantik</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {report.duplicateScores && (
+                      <Badge className={`text-xs ${getScoreBgColor(report.duplicateScores.semantic)}`}>
+                        {Math.round(report.duplicateScores.semantic * 100)}%
+                      </Badge>
+                    )}
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-3 pb-3 space-y-3">
+                    {/* Sinyal Visual Terdeteksi */}
+                    <div>
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                        <Target className="w-3 h-3" />
+                        <span>Sinyal Visual Terdeteksi</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline" className="text-xs bg-background">
+                          {report.jenisHazard?.toLowerCase() || "hazard terdeteksi"}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs bg-background">
+                          {report.lokasiArea?.toLowerCase() || "area kerja"}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs bg-background">
+                          kondisi tidak aman
+                        </Badge>
+                      </div>
+                    </div>
+                    {/* Interpretasi Makna */}
+                    <div>
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                        <Sparkles className="w-3 h-3" />
+                        <span>Interpretasi Makna</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground italic">
+                        Gambar menunjukkan {report.subJenisHazard?.toLowerCase() || "kondisi berbahaya"} di {report.detailLokasi?.toLowerCase() || "area kerja"} yang berpotensi menyebabkan kecelakaan.
+                      </p>
+                    </div>
+                  </div>
+                </CollapsibleContent>
               </div>
-              <div>
-                <span className="text-xs text-muted-foreground">Sub Ketidaksesuaian</span>
-                <p className="text-sm font-medium text-foreground mt-1">{report.subKetidaksesuaian || report.subJenisHazard}</p>
-              </div>
-              <div>
-                <span className="text-xs text-muted-foreground">Quick Action</span>
-                <div className="mt-1">
-                  <Badge variant="outline" className="text-xs">
-                    <Zap className="w-3 h-3 mr-1" />
-                    {report.quickAction}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          </div>
+            </Collapsible>
 
-          {/* SEMANTIC CLUSTER Section */}
-          <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
-            <div className="flex items-center gap-2 mb-3">
-              <Target className="w-4 h-4 text-primary" />
-              <span className="font-medium text-sm text-primary">Semantic Cluster</span>
-              <Badge className={`ml-auto text-xs ${getScoreBgColor(report.duplicateScores?.semantic || 0)}`}>
-                {Math.round((report.duplicateScores?.semantic || 0) * 100)}%
-              </Badge>
-            </div>
-            
-            {/* Deskripsi Laporan */}
-            <div className="mb-3">
-              <span className="text-xs text-muted-foreground">Deskripsi Laporan</span>
-              <p className="text-sm text-foreground mt-1">
-                {report.deskripsiTemuan}
-              </p>
-            </div>
+            {/* GEO ANALYSIS - Expandable */}
+            <Collapsible>
+              <div className="bg-success/5 rounded-lg border border-success/20 overflow-hidden">
+                <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-success/10 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Navigation className="w-4 h-4 text-success" />
+                    <span className="font-medium text-sm text-success">Analisis Geo</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {report.duplicateScores && (
+                      <Badge className={`text-xs ${getScoreBgColor(report.duplicateScores.geo)}`}>
+                        {Math.round(report.duplicateScores.geo * 100)}%
+                      </Badge>
+                    )}
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-3 pb-3 space-y-2">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-xs text-muted-foreground">Site</span>
+                        <p className="text-sm font-medium text-foreground mt-0.5">{report.site}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">Lokasi</span>
+                        <p className="text-sm font-medium text-foreground mt-0.5">{report.lokasiArea || report.lokasi}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">Detail Lokasi</span>
+                      <p className="text-sm font-medium text-foreground mt-0.5">{report.detailLokasi}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-xs text-muted-foreground">Longitude</span>
+                        <p className="text-sm font-medium text-foreground mt-0.5">{report.longitude || "116.8523"}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground">Latitude</span>
+                        <p className="text-sm font-medium text-foreground mt-0.5">{report.latitude || "-1.2456"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
 
-            {/* Image Section */}
-            <div className="mb-3">
-              <span className="text-xs text-muted-foreground mb-2 block">Gambar Temuan</span>
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border border-border">
-                <Image className="w-12 h-12 text-muted-foreground/30" />
+            {/* LEXICAL ANALYSIS - Expandable */}
+            <Collapsible>
+              <div className="bg-warning/5 rounded-lg border border-warning/20 overflow-hidden">
+                <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-warning/10 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <BookText className="w-4 h-4 text-warning" />
+                    <span className="font-medium text-sm text-warning">Analisis Lexical</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {report.duplicateScores && (
+                      <Badge className={`text-xs ${getScoreBgColor(report.duplicateScores.lexical)}`}>
+                        {Math.round(report.duplicateScores.lexical * 100)}%
+                      </Badge>
+                    )}
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="px-3 pb-3 space-y-2">
+                    <div>
+                      <span className="text-xs text-muted-foreground">Ketidaksesuaian</span>
+                      <p className="text-sm font-medium text-foreground mt-0.5">{report.ketidaksesuaian || report.jenisHazard}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">Sub Ketidaksesuaian</span>
+                      <p className="text-sm font-medium text-foreground mt-0.5">{report.subKetidaksesuaian || report.subJenisHazard}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-muted-foreground">Quick Action</span>
+                      <div className="mt-1">
+                        <Badge variant="outline" className="text-xs">
+                          <Zap className="w-3 h-3 mr-1" />
+                          {report.quickAction}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleContent>
               </div>
-            </div>
-
-            {/* VLM Context / Image Extraction */}
-            <div className="bg-background/50 rounded-lg p-3 border border-border">
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                <Sparkles className="w-3 h-3" />
-                <span>Konteks VLM / Ekstraksi Gambar</span>
-              </div>
-              <div className="flex flex-wrap gap-2 mb-2">
-                <Badge variant="outline" className="text-xs bg-background">
-                  {report.jenisHazard?.toLowerCase() || "hazard terdeteksi"}
-                </Badge>
-                <Badge variant="outline" className="text-xs bg-background">
-                  {report.lokasiArea?.toLowerCase() || "area kerja"}
-                </Badge>
-                <Badge variant="outline" className="text-xs bg-background">
-                  kondisi tidak aman
-                </Badge>
-              </div>
-              <p className="text-xs text-muted-foreground italic">
-                Gambar menunjukkan {report.subJenisHazard?.toLowerCase() || "kondisi berbahaya"} di {report.detailLokasi?.toLowerCase() || "area kerja"} yang memerlukan tindakan segera.
-              </p>
-            </div>
+            </Collapsible>
           </div>
         </div>
       </ScrollArea>
@@ -722,117 +783,165 @@ const ClusterPanel = ({ cluster, onClose, onSelectReport }: ClusterPanelProps) =
                 </div>
               </div>
 
-              {/* GEO CLUSTER Section */}
-              <div className="bg-success/5 rounded-lg p-4 border border-success/20">
-                <div className="flex items-center gap-2 mb-3">
-                  <Navigation className="w-4 h-4 text-success" />
-                  <span className="font-medium text-sm text-success">Geo Cluster</span>
+              {/* Site & Location Info */}
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="text-xs">
+                  <Building className="w-3 h-3 mr-1" />
+                  {representativeReport.site}
+                </Badge>
+                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5" />
+                  {representativeReport.lokasiArea || representativeReport.lokasi}
+                </span>
+              </div>
+
+              {/* Asal Cluster */}
+              <div className="text-xs">
+                <span className="text-muted-foreground">Asal Cluster</span>
+                <p className="text-foreground mt-0.5">{representativeReport.cluster ? `Cluster ${representativeReport.cluster}` : "Tidak ada cluster sebelumnya"}</p>
+              </div>
+
+              {/* Deskripsi Temuan */}
+              <div className="bg-muted/30 rounded-lg p-4 border-l-4 border-primary/50">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                  <FileText className="w-3 h-3" />
+                  <span>Deskripsi Temuan</span>
                 </div>
-                <div className="space-y-2">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <span className="text-xs text-muted-foreground">Site</span>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Building className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span className="text-sm font-medium text-foreground">{representativeReport.site}</span>
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-xs text-muted-foreground">Lokasi</span>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span className="text-sm font-medium text-foreground">{representativeReport.lokasiArea || representativeReport.lokasi}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground">Detail Lokasi</span>
-                    <p className="text-sm font-medium text-foreground mt-1">{representativeReport.detailLokasi}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <span className="text-xs text-muted-foreground">Longitude</span>
-                      <p className="text-sm font-medium text-foreground mt-1">{representativeReport.longitude || "116.8523"}</p>
-                    </div>
-                    <div>
-                      <span className="text-xs text-muted-foreground">Latitude</span>
-                      <p className="text-sm font-medium text-foreground mt-1">{representativeReport.latitude || "-1.2456"}</p>
-                    </div>
-                  </div>
+                <p className="text-sm text-foreground">{representativeReport.deskripsiTemuan}</p>
+              </div>
+
+              {/* Gambar Temuan */}
+              <div>
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                  <Image className="w-3 h-3" />
+                  <span>Gambar Temuan (1)</span>
+                </div>
+                <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border border-border">
+                  <Image className="w-12 h-12 text-muted-foreground/30" />
                 </div>
               </div>
 
-              {/* LEXICAL CLUSTER Section */}
-              <div className="bg-warning/5 rounded-lg p-4 border border-warning/20">
-                <div className="flex items-center gap-2 mb-3">
-                  <BookText className="w-4 h-4 text-warning" />
-                  <span className="font-medium text-sm text-warning">Lexical Cluster</span>
-                </div>
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-xs text-muted-foreground">Ketidaksesuaian</span>
-                    <p className="text-sm font-medium text-foreground mt-1">{representativeReport.ketidaksesuaian || representativeReport.jenisHazard}</p>
+              {/* Expandable Analysis Sections */}
+              <div className="space-y-2">
+                {/* SEMANTIC ANALYSIS - Expandable */}
+                <Collapsible defaultOpen>
+                  <div className="bg-primary/5 rounded-lg border border-primary/20 overflow-hidden">
+                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        <span className="font-medium text-sm text-primary">Analisis Semantik</span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-3 pb-3 space-y-3">
+                        {/* Sinyal Visual Terdeteksi */}
+                        <div>
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                            <Target className="w-3 h-3" />
+                            <span>Sinyal Visual Terdeteksi</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="outline" className="text-xs bg-background">
+                              {representativeReport.jenisHazard?.toLowerCase() || "hazard terdeteksi"}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs bg-background">
+                              {representativeReport.lokasiArea?.toLowerCase() || "area kerja"}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs bg-background">
+                              kondisi tidak aman
+                            </Badge>
+                          </div>
+                        </div>
+                        {/* Interpretasi Makna */}
+                        <div>
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                            <Sparkles className="w-3 h-3" />
+                            <span>Interpretasi Makna</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground italic">
+                            Gambar menunjukkan {representativeReport.subJenisHazard?.toLowerCase() || "kondisi berbahaya"} di {representativeReport.detailLokasi?.toLowerCase() || "area kerja"} yang berpotensi menyebabkan kecelakaan.
+                          </p>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
                   </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground">Sub Ketidaksesuaian</span>
-                    <p className="text-sm font-medium text-foreground mt-1">{representativeReport.subKetidaksesuaian || representativeReport.subJenisHazard}</p>
-                  </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground">Quick Action</span>
-                    <div className="mt-1">
-                      <Badge variant="outline" className="text-xs">
-                        <Zap className="w-3 h-3 mr-1" />
-                        {representativeReport.quickAction}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </Collapsible>
 
-              {/* SEMANTIC CLUSTER Section */}
-              <div className="bg-primary/5 rounded-lg p-4 border border-primary/20">
-                <div className="flex items-center gap-2 mb-3">
-                  <Target className="w-4 h-4 text-primary" />
-                  <span className="font-medium text-sm text-primary">Semantic Cluster</span>
-                </div>
-                
-                {/* Deskripsi Laporan */}
-                <div className="mb-3">
-                  <span className="text-xs text-muted-foreground">Deskripsi Laporan</span>
-                  <p className="text-sm text-foreground mt-1">
-                    {representativeReport.deskripsiTemuan}
-                  </p>
-                </div>
+                {/* GEO ANALYSIS - Expandable */}
+                <Collapsible>
+                  <div className="bg-success/5 rounded-lg border border-success/20 overflow-hidden">
+                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-success/10 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <Navigation className="w-4 h-4 text-success" />
+                        <span className="font-medium text-sm text-success">Analisis Geo</span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-3 pb-3 space-y-2">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <span className="text-xs text-muted-foreground">Site</span>
+                            <p className="text-sm font-medium text-foreground mt-0.5">{representativeReport.site}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">Lokasi</span>
+                            <p className="text-sm font-medium text-foreground mt-0.5">{representativeReport.lokasiArea || representativeReport.lokasi}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground">Detail Lokasi</span>
+                          <p className="text-sm font-medium text-foreground mt-0.5">{representativeReport.detailLokasi}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <span className="text-xs text-muted-foreground">Longitude</span>
+                            <p className="text-sm font-medium text-foreground mt-0.5">{representativeReport.longitude || "116.8523"}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs text-muted-foreground">Latitude</span>
+                            <p className="text-sm font-medium text-foreground mt-0.5">{representativeReport.latitude || "-1.2456"}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
 
-                {/* Image Section */}
-                <div className="mb-3">
-                  <span className="text-xs text-muted-foreground mb-2 block">Gambar Temuan</span>
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center border border-border">
-                    <Image className="w-12 h-12 text-muted-foreground/30" />
+                {/* LEXICAL ANALYSIS - Expandable */}
+                <Collapsible>
+                  <div className="bg-warning/5 rounded-lg border border-warning/20 overflow-hidden">
+                    <CollapsibleTrigger className="w-full p-3 flex items-center justify-between hover:bg-warning/10 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <BookText className="w-4 h-4 text-warning" />
+                        <span className="font-medium text-sm text-warning">Analisis Lexical</span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="px-3 pb-3 space-y-2">
+                        <div>
+                          <span className="text-xs text-muted-foreground">Ketidaksesuaian</span>
+                          <p className="text-sm font-medium text-foreground mt-0.5">{representativeReport.ketidaksesuaian || representativeReport.jenisHazard}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground">Sub Ketidaksesuaian</span>
+                          <p className="text-sm font-medium text-foreground mt-0.5">{representativeReport.subKetidaksesuaian || representativeReport.subJenisHazard}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground">Quick Action</span>
+                          <div className="mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              <Zap className="w-3 h-3 mr-1" />
+                              {representativeReport.quickAction}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
                   </div>
-                </div>
-
-                {/* VLM Context */}
-                <div className="bg-background/50 rounded-lg p-3 border border-border">
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                    <Sparkles className="w-3 h-3" />
-                    <span>Konteks VLM / Ekstraksi Gambar</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    <Badge variant="outline" className="text-xs bg-background">
-                      {representativeReport.jenisHazard?.toLowerCase() || "hazard terdeteksi"}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs bg-background">
-                      {representativeReport.lokasiArea?.toLowerCase() || "area kerja"}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs bg-background">
-                      kondisi tidak aman
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground italic">
-                    Gambar menunjukkan {representativeReport.subJenisHazard?.toLowerCase() || "kondisi berbahaya"} di {representativeReport.detailLokasi?.toLowerCase() || "area kerja"}.
-                  </p>
-                </div>
+                </Collapsible>
               </div>
             </div>
           </ScrollArea>
